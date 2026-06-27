@@ -1,0 +1,132 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using BankITDeskHelp.Data;
+using BankITDeskHelp.Models;
+using BankITDeskHelp.ViewModels;
+
+namespace BankITDeskHelp.Controllers
+{
+    public class ComplaintController : Controller
+    {
+        private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _env;
+
+        public ComplaintController(ApplicationDbContext context, IWebHostEnvironment env)
+        {
+            _context = context;
+            _env = env;
+        }
+
+        // GET: /Complaint/Create
+        public async Task<IActionResult> Create()
+        {
+            var vm = new ComplaintCreateViewModel
+            {
+                Branches = await _context.Branches.OrderBy(b => b.Name).ToListAsync(),
+                Departments = await _context.Departments.OrderBy(d => d.Name).ToListAsync(),
+                Categories = await _context.Categories.OrderBy(c => c.Name).ToListAsync()
+            };
+            return View(vm);
+        }
+
+        // POST: /Complaint/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(ComplaintCreateViewModel vm)
+        {
+            if (!ModelState.IsValid)
+            {
+                vm.Branches = await _context.Branches.OrderBy(b => b.Name).ToListAsync();
+                vm.Departments = await _context.Departments.OrderBy(d => d.Name).ToListAsync();
+                vm.Categories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
+                return View(vm);
+            }
+
+            var complaint = new Complaint
+            {
+                TicketNumber = await GenerateTicketNumberAsync(),
+                EmployeeName = vm.EmployeeName,
+                EmployeeId = vm.EmployeeId,
+                Email = vm.Email,
+                Phone = vm.Phone,
+                BranchId = vm.BranchId,
+                DepartmentId = vm.DepartmentId,
+                CategoryId = vm.CategoryId,
+                Priority = vm.Priority,
+                Subject = vm.Subject,
+                Description = vm.Description,
+                Status = ComplaintStatus.New,
+                CreatedAt = DateTime.Now
+            };
+
+            _context.Complaints.Add(complaint);
+            await _context.SaveChangesAsync();
+
+            // Handle file attachment
+            if (vm.Attachment != null && vm.Attachment.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
+                Directory.CreateDirectory(uploadsFolder);
+
+                var uniqueFileName = $"{Guid.NewGuid()}_{vm.Attachment.FileName}";
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await vm.Attachment.CopyToAsync(stream);
+                }
+
+                _context.Attachments.Add(new Attachment
+                {
+                    ComplaintId = complaint.Id,
+                    FileName = vm.Attachment.FileName,
+                    FilePath = $"/uploads/{uniqueFileName}"
+                });
+            }
+
+            // Record history entry
+            _context.ComplaintHistories.Add(new ComplaintHistory
+            {
+                ComplaintId = complaint.Id,
+                Action = "Complaint Created",
+                Details = $"Submitted by {complaint.EmployeeName}",
+                Timestamp = DateTime.Now
+            });
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Confirmation", new { ticketNumber = complaint.TicketNumber });
+        }
+
+        // GET: /Complaint/Confirmation?ticketNumber=IT-2026-00001
+        public IActionResult Confirmation(string ticketNumber)
+        {
+            ViewBag.TicketNumber = ticketNumber;
+            return View();
+        }
+
+        private async Task<string> GenerateTicketNumberAsync()
+        {
+            int year = DateTime.Now.Year;
+            string prefix = $"IT-{year}-";
+
+            var lastTicket = await _context.Complaints
+                .Where(c => c.TicketNumber.StartsWith(prefix))
+                .OrderByDescending(c => c.Id)
+                .Select(c => c.TicketNumber)
+                .FirstOrDefaultAsync();
+
+            int nextNumber = 1;
+            if (lastTicket != null)
+            {
+                var numberPart = lastTicket.Substring(prefix.Length);
+                if (int.TryParse(numberPart, out int parsed))
+                {
+                    nextNumber = parsed + 1;
+                }
+            }
+
+            return $"{prefix}{nextNumber:D5}"; // IT-2026-00001
+        }
+    }
+}

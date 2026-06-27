@@ -1,0 +1,77 @@
+﻿@{
+    ViewData["Title"] = "Welcome";
+}
+
+<div class="hero bg-light py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold">BankITDesk — Submit a Complaint. Get Faster Resolution.</h1>
+                <p class="lead text-muted">A simple, modern ticketing experience for employees. Create a ticket, track progress, and get notified when it's resolved.</p>
+
+                <p class="mt-4">
+                    <a class="btn btn-primary btn-lg me-2" href="/Account/Login">Sign In</a>
+                    <a class="btn btn-outline-secondary btn-lg" href="#createComplaint">Lodge a Complaint</a>
+                </p>
+            </div>
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">Quick Complaint</h5>
+                        <form asp-controller="Complaint" asp-action="Create" method="post" enctype="multipart/form-data" id="createComplaint">
+                            <div class="row g-2">
+                                <div class="col-12">
+                                    <label class="form-label">Employee Name</label>
+                                    <input name="EmployeeName" class="form-control" required />
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label">Employee ID</label>
+                                    <input name="EmployeeId" class="form-control" required />
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label">Email</label>
+                                    <input name="Email" type="email" class="form-control" required />
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Subject</label>
+                                    <input name="Subject" class="form-control" maxlength="200" required />
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Description</label>
+                                    <textarea name="Description" class="form-control" rows="4" required></textarea>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label">Department</label>
+                                    <select name="DepartmentId" class="form-select">
+                                        <option value="">Select</option>
+                                        @foreach (var d in ViewBag.Departments as List<BankITDeskHelp.Models.Department> ?? new List<BankITDeskHelp.Models.Department>())
+                                        {
+                                            <option value="@d.Id">@d.Name</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label">Branch</label>
+                                    <select name="BranchId" class="form-select">
+                                        <option value="">Select</option>
+                                        @foreach (var b in ViewBag.Branches as List<BankITDeskHelp.Models.Branch> ?? new List<BankITDeskHelp.Models.Branch>())
+                                        {
+                                            <option value="@b.Id">@b.Name</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Attachment (optional)</label>
+                                    <input type="file" name="Attachment" class="form-control" />
+                                </div>
+                                <div class="col-12 text-end">
+                                    <button type="submit" class="btn btn-success">Submit Complaint</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

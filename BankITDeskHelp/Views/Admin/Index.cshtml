@@ -1,0 +1,201 @@
+﻿@model List<BankITDeskHelp.Models.Complaint>
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold">Admin Dashboard</h3>
+        <div>
+            <a asp-controller="Admin" asp-action="Assign" class="btn btn-outline-primary me-2">Bulk Assign</a>
+            <a asp-controller="Admin" asp-action="Verify" class="btn btn-primary">Verify Tickets</a>
+            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline ms-2">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-outline-danger">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm border-0 bg-secondary text-white p-3">
+                <div class="card-body">
+                    <div class="small text-muted">New</div>
+                    <h2 class="fw-bold">@ViewBag.NewCount</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm border-0 bg-info text-white p-3">
+                <div class="card-body">
+                    <div class="small text-muted">Assigned</div>
+                    <h2 class="fw-bold">@ViewBag.AssignedCount</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm border-0 bg-warning text-dark p-3">
+                <div class="card-body">
+                    <div class="small text-muted">In Progress</div>
+                    <h2 class="fw-bold">@ViewBag.InProgressCount</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm border-0 bg-primary text-white p-3">
+                <div class="card-body">
+                    <div class="small text-muted">Resolved</div>
+                    <h2 class="fw-bold">@ViewBag.ResolvedCount</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm border-0 bg-success text-white p-3">
+                <div class="card-body">
+                    <div class="small text-muted">Closed</div>
+                    <h2 class="fw-bold">@ViewBag.ClosedCount</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card text-center shadow-sm border-0 bg-dark text-white p-3">
+                <div class="card-body">
+                    <div class="small text-muted">Users</div>
+                    <h2 class="fw-bold">@ViewBag.TotalUsers</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="fw-bold">Tickets Overview</h5>
+                    <canvas id="adminChart" style="height:220px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="fw-bold">Recent Complaints</h5>
+                    <div class="mb-3">
+                        <canvas id="deptChart" style="height:170px;"></canvas>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        @foreach (var c in Model.Take(6))
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="fw-bold">@c.Subject</div>
+                                    <div class="small text-muted">@c.TicketNumber • @c.CreatedAt.ToString("dd MMM")</div>
+                                </div>
+                                <span class="badge bg-secondary">@c.Status</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Ticket</th>
+                        <th>Subject</th>
+                        <th>Department</th>
+                        <th>Branch</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model)
+                    {
+                        <tr>
+                            <td>@c.TicketNumber</td>
+                            <td>@c.Subject</td>
+                            <td>@c.Department?.Name</td>
+                            <td>@c.Branch?.Name</td>
+                            <td>@c.Priority</td>
+                            <td><span class="badge bg-secondary">@c.Status</span></td>
+                            <td>@c.CreatedAt.ToString("dd MMM yyyy")</td>
+                            <td>
+                                @if (c.Status == BankITDeskHelp.Models.ComplaintStatus.New)
+                                {
+                                    <a asp-action="Assign" asp-route-id="@c.Id" class="btn btn-sm btn-outline-primary">Assign</a>
+                                }
+                                else if (c.Status == BankITDeskHelp.Models.ComplaintStatus.Resolved)
+                                {
+                                    <a asp-action="Verify" asp-route-id="@c.Id" class="btn btn-sm btn-outline-success">Verify</a>
+                                }
+                                else
+                                {
+                                    <a asp-action="Verify" asp-route-id="@c.Id" class="btn btn-sm btn-outline-secondary">View</a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        async function loadAdminMetrics() {
+            const res = await fetch('/Admin/DashboardData');
+            if (!res.ok) return;
+            const metrics = await res.json();
+
+            // Bar chart: status counts
+            const ctx = document.getElementById('adminChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: metrics.statusLabels,
+                    datasets: [{
+                        label: 'Tickets',
+                        data: metrics.statusCounts,
+                        backgroundColor: ['#6c757d', '#17a2b8', '#ffc107', '#0d6efd', '#28a745']
+                    }]
+                },
+                options: { responsive: true }
+            });
+
+            // Donut: department breakdown
+            const deptCtx = document.getElementById('deptChart').getContext('2d');
+            const deptLabels = metrics.departmentMetrics.map(d => d.departmentName);
+            const deptCounts = metrics.departmentMetrics.map(d => d.count);
+
+            new Chart(deptCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: deptLabels,
+                    datasets: [{
+                        data: deptCounts,
+                        backgroundColor: deptLabels.map((_, i) => ['#007bff','#6610f2','#6f42c1','#e83e8c','#fd7e14','#ffc107','#20c997','#17a2b8','#6c757d','#343a40'][i % 10])
+                    }]
+                },
+                options: { responsive: true }
+            });
+
+            // Update KPI cards (optional)
+            document.querySelectorAll('[data-metric="new"]').forEach(el => el.textContent = metrics.newCount);
+            document.querySelectorAll('[data-metric="assigned"]').forEach(el => el.textContent = metrics.assignedCount);
+            document.querySelectorAll('[data-metric="inprogress"]').forEach(el => el.textContent = metrics.inProgressCount);
+            document.querySelectorAll('[data-metric="resolved"]').forEach(el => el.textContent = metrics.resolvedCount);
+            document.querySelectorAll('[data-metric="closed"]').forEach(el => el.textContent = metrics.closedCount);
+        }
+
+        document.addEventListener('DOMContentLoaded', loadAdminMetrics);
+    </script>
+}

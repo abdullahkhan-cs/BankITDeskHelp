@@ -1,0 +1,19 @@
+﻿@{
+    ViewData["Title"] = "Complaint Submitted";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 text-center p-4">
+                <div class="card-body">
+                    <h2 class="text-success mb-3">✅ Complaint Submitted Successfully</h2>
+                    <p class="text-muted">Your ticket number is:</p>
+                    <h3 class="fw-bold mb-4">@ViewBag.TicketNumber</h3>
+                    <p>Please save this number to track your complaint status.</p>
+                    <a asp-controller="Complaint" asp-action="Track" class="btn btn-outline-primary mt-3">Track Complaint</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

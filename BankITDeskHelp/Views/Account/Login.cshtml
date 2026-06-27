@@ -1,0 +1,52 @@
+﻿@model BankITDeskHelp.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = "_Layout";
+}
+
+<div class="d-flex align-items-center justify-content-center" style="min-height:70vh;">
+    <div class="card shadow-lg border-0" style="max-width:420px; width:100%;">
+        <div class="card-body p-4">
+            <h3 class="text-center mb-3 fw-bold">Welcome Back</h3>
+            <p class="text-center text-muted small">Sign in to manage your complaints and view status updates.</p>
+
+            <form asp-action="Login" method="post" novalidate>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input asp-for="Password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="form-check">
+                        <input asp-for="RememberMe" class="form-check-input" />
+                        <label class="form-check-label">Remember Me</label>
+                    </div>
+                    <a href="#" class="small">Forgot?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Sign In</button>
+
+                <div class="text-center mt-3 small text-muted">Or continue with</div>
+                <div class="d-flex gap-2 mt-2">
+                    <button class="btn btn-outline-secondary w-100">SSO</button>
+                    <button class="btn btn-outline-secondary w-100">Staff ID</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
