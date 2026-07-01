@@ -17,14 +17,15 @@ namespace BankITDeskHelp.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login()
+        public IActionResult Login(string? returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             return View(new LoginViewModel());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel vm)
+        public async Task<IActionResult> Login(LoginViewModel vm, string? returnUrl = null)
         {
             if (!ModelState.IsValid)
                 return View(vm);
@@ -35,6 +36,12 @@ namespace BankITDeskHelp.Controllers
             {
                 ModelState.AddModelError(string.Empty, "Invalid email or password.");
                 return View(vm);
+            }
+
+            // If a returnUrl was provided and it's local, redirect there first
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
             }
 
             var user = await _userManager.FindByEmailAsync(vm.Email);

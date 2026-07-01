@@ -1,100 +1,334 @@
-﻿@model BankITDeskHelp.ViewModels.ComplaintCreateViewModel
+@model BankITDeskHelp.Models.Complaint
 @{
-    ViewData["Title"] = "Create Complaint";
+    ViewData["Title"] = "Lodge a Complaint - BankITDesk";
 }
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-7">
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-4">
-                    <h3 class="mb-1 fw-bold">Submit a Complaint</h3>
-                    <p class="text-muted mb-4">Fill in the details below and our IT team will get back to you.</p>
+<style>
+    .page-wrapper {
+        width: 100%;
+        max-width: 900px;
+        animation: fadeInUp 0.6s ease;
+    }
 
-                    <form asp-action="Create" method="post" enctype="multipart/form-data">
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger d-none" id="validationSummary"></div>
+    @@keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Employee Name</label>
-                                <input asp-for="EmployeeName" class="form-control" placeholder="John Doe" />
-                                <span asp-validation-for="EmployeeName" class="text-danger small"></span>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Employee ID</label>
-                                <input asp-for="EmployeeId" class="form-control" placeholder="EMP-1023" />
-                                <span asp-validation-for="EmployeeId" class="text-danger small"></span>
-                            </div>
+    .page-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+    }
 
-                            <div class="col-md-6">
-                                <label class="form-label">Branch</label>
-                                <select asp-for="BranchId" class="form-select"
-                                        asp-items="@(new SelectList(Model.Branches, "Id", "Name"))">
-                                    <option value="">-- Select Branch --</option>
-                                </select>
-                                <span asp-validation-for="BranchId" class="text-danger small"></span>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Department</label>
-                                <select asp-for="DepartmentId" class="form-select"
-                                        asp-items="@(new SelectList(Model.Departments, "Id", "Name"))">
-                                    <option value="">-- Select Department --</option>
-                                </select>
-                                <span asp-validation-for="DepartmentId" class="text-danger small"></span>
-                            </div>
+    .form-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid var(--primary);
+    }
 
-                            <div class="col-md-6">
-                                <label class="form-label">Email</label>
-                                <input asp-for="Email" class="form-control" placeholder="you@bank.com" />
-                                <span asp-validation-for="Email" class="text-danger small"></span>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Phone (optional)</label>
-                                <input asp-for="Phone" class="form-control" placeholder="0300-1234567" />
-                            </div>
+    .form-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
 
-                            <div class="col-md-6">
-                                <label class="form-label">Category</label>
-                                <select asp-for="CategoryId" class="form-select"
-                                        asp-items="@(new SelectList(Model.Categories, "Id", "Name"))">
-                                    <option value="">-- Select Category --</option>
-                                </select>
-                                <span asp-validation-for="CategoryId" class="text-danger small"></span>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Priority</label>
-                                <select asp-for="Priority" class="form-select"
-                                        asp-items="Html.GetEnumSelectList<BankITDeskHelp.Models.PriorityLevel>()">
-                                </select>
-                            </div>
+    .form-subtitle {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+    }
 
-                            <div class="col-12">
-                                <label class="form-label">Subject</label>
-                                <input asp-for="Subject" class="form-control" placeholder="Brief summary of the issue" />
-                                <span asp-validation-for="Subject" class="text-danger small"></span>
-                            </div>
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
 
-                            <div class="col-12">
-                                <label class="form-label">Description</label>
-                                <textarea asp-for="Description" class="form-control" rows="4" placeholder="Describe your issue in detail..."></textarea>
-                                <span asp-validation-for="Description" class="text-danger small"></span>
-                            </div>
+    .form-group-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.25rem;
+    }
 
-                            <div class="col-12">
-                                <label class="form-label">Attachment (optional)</label>
-                                <input asp-for="Attachment" type="file" class="form-control" />
-                            </div>
-                        </div>
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+    }
 
-                        <div class="d-grid mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg">Submit Complaint</button>
-                        </div>
-                    </form>
+    .form-required {
+        color: var(--danger);
+        margin-left: 0.25rem;
+    }
+
+    .form-control, .form-select {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid var(--gray-300);
+        border-radius: 0.75rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .form-hint {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        margin-top: 0.25rem;
+    }
+
+    .file-upload {
+        position: relative;
+    }
+
+    .file-input {
+        position: absolute;
+        left: -9999px;
+    }
+
+    .file-label {
+        display: inline-block;
+        padding: 0.75rem 1.25rem;
+        background: var(--light);
+        border: 2px dashed var(--primary);
+        border-radius: 0.75rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: var(--primary);
+        font-weight: 500;
+    }
+
+    .file-label:hover {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(79, 70, 229, 0.05));
+    }
+
+    .file-name {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        margin-top: 0.5rem;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--gray-200);
+    }
+
+    .btn-submit {
+        padding: 0.875rem 2rem;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        border: none;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-cancel {
+        padding: 0.875rem 2rem;
+        background: transparent;
+        color: var(--primary);
+        border: 2px solid var(--primary);
+        border-radius: 0.75rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+        background: var(--primary);
+        color: white;
+        text-decoration: none;
+    }
+
+    .alert {
+        padding: 1rem;
+        border-radius: 0.75rem;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .alert-danger {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .section-divider {
+        height: 2px;
+        background: linear-gradient(135deg, transparent, var(--primary), transparent);
+        margin: 2rem 0;
+    }
+</style>
+
+<div class="page-wrapper">
+    <div class="page-card">
+        <div class="form-header">
+            <h1 class="form-title">Lodge a Complaint</h1>
+            <p class="form-subtitle">Fill in the details below to submit your complaint to our support team</p>
+        </div>
+
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+        <form asp-action="Create" method="post" enctype="multipart/form-data" novalidate>
+            <!-- Personal Information Section -->
+            <h3 style="color: var(--text-primary); margin-bottom: 1rem; font-weight: 600;">Personal Information</h3>
+
+            <div class="form-group-row">
+                <div class="form-group">
+                    <label class="form-label">
+                        Employee Name
+                        <span class="form-required">*</span>
+                    </label>
+                    <input asp-for="EmployeeName" class="form-control" placeholder="John Doe" required />
+                    <span asp-validation-for="EmployeeName" style="color: var(--danger); font-size: 0.85rem;"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Employee ID
+                        <span class="form-required">*</span>
+                    </label>
+                    <input asp-for="EmployeeId" class="form-control" placeholder="EMP12345" required />
+                    <span asp-validation-for="EmployeeId" style="color: var(--danger); font-size: 0.85rem;"></span>
                 </div>
             </div>
-        </div>
+
+            <div class="form-group-row">
+                <div class="form-group">
+                    <label class="form-label">
+                        Email Address
+                        <span class="form-required">*</span>
+                    </label>
+                    <input asp-for="Email" type="email" class="form-control" placeholder="your@email.com" required />
+                    <span asp-validation-for="Email" style="color: var(--danger); font-size: 0.85rem;"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input asp-for="Phone" type="tel" class="form-control" placeholder="+1 (555) 000-0000" />
+                    <span asp-validation-for="Phone" style="color: var(--danger); font-size: 0.85rem;"></span>
+                </div>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <!-- Location Information Section -->
+            <h3 style="color: var(--text-primary); margin-bottom: 1rem; font-weight: 600;">Location Information</h3>
+
+            <div class="form-group-row">
+                <div class="form-group">
+                    <label class="form-label">
+                        Department
+                        <span class="form-required">*</span>
+                    </label>
+                    <select asp-for="DepartmentId" class="form-select" required>
+                        <option value="">-- Select Department --</option>
+                        @foreach (var dept in ViewBag.Departments ?? new List<dynamic>())
+                        {
+                            <option value="@dept.Id">@dept.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="DepartmentId" style="color: var(--danger); font-size: 0.85rem;"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Branch
+                        <span class="form-required">*</span>
+                    </label>
+                    <select asp-for="BranchId" class="form-select" required>
+                        <option value="">-- Select Branch --</option>
+                        @foreach (var branch in ViewBag.Branches ?? new List<dynamic>())
+                        {
+                            <option value="@branch.Id">@branch.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="BranchId" style="color: var(--danger); font-size: 0.85rem;"></span>
+                </div>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <!-- Complaint Details Section -->
+            <h3 style="color: var(--text-primary); margin-bottom: 1rem; font-weight: 600;">Complaint Details</h3>
+
+            <div class="form-group">
+                <label class="form-label">
+                    Subject
+                    <span class="form-required">*</span>
+                </label>
+                <input asp-for="Subject" class="form-control" maxlength="200" placeholder="Brief summary of your issue" required />
+                <span asp-validation-for="Subject" style="color: var(--danger); font-size: 0.85rem;"></span>
+                <div class="form-hint">Max 200 characters</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    Description
+                    <span class="form-required">*</span>
+                </label>
+                <textarea asp-for="Description" class="form-control" placeholder="Provide detailed information about your complaint..." required></textarea>
+                <span asp-validation-for="Description" style="color: var(--danger); font-size: 0.85rem;"></span>
+                <div class="form-hint">Please be as detailed as possible</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Attachment</label>
+                <div class="file-upload">
+                    <input type="file" id="attachment" name="Attachment" class="file-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg" />
+                    <label for="attachment" class="file-label">
+                        📎 Click to upload or drag file here
+                    </label>
+                    <div class="form-hint">Supported formats: PDF, DOC, XLS, PNG, JPG (Max 5MB)</div>
+                    <div class="file-name" id="fileName"></div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">Submit Complaint</button>
+                <a href="/" class="btn-cancel">Cancel</a>
+            </div>
+        </form>
     </div>
 </div>
+
+<script>
+    document.getElementById('attachment').addEventListener('change', function(e) {
+        const fileName = e.target.files[0]?.name;
+        document.getElementById('fileName').textContent = fileName ? `Selected: ${fileName}` : '';
+    });
+</script>
 
 @section Scripts {
     @{

@@ -87,24 +87,32 @@ namespace BankITDeskHelp.Data
         }
         public static async Task SeedManagerUserAsync(UserManager<ApplicationUser> userManager)
         {
-            string managerEmail = "manager@bankitdesk.com";
-            string managerPassword = "Manager@123";
-
-            var existingManager = await userManager.FindByEmailAsync(managerEmail);
-            if (existingManager == null)
+            // Seed multiple manager accounts for automatic assignment
+            var managers = new[]
             {
-                var managerUser = new ApplicationUser
-                {
-                    UserName = managerEmail,
-                    Email = managerEmail,
-                    FullName = "ATM Support Manager",
-                    EmailConfirmed = true
-                };
+                new { Email = "manager1@bankitdesk.com", Password = "Manager@123", FullName = "ATM Support Manager" },
+                new { Email = "manager2@bankitdesk.com", Password = "Manager@123", FullName = "Core Banking Manager" },
+                new { Email = "manager3@bankitdesk.com", Password = "Manager@123", FullName = "Network Manager" }
+            };
 
-                var result = await userManager.CreateAsync(managerUser, managerPassword);
-                if (result.Succeeded)
+            foreach (var m in managers)
+            {
+                var existing = await userManager.FindByEmailAsync(m.Email);
+                if (existing == null)
                 {
-                    await userManager.AddToRoleAsync(managerUser, "Manager");
+                    var user = new ApplicationUser
+                    {
+                        UserName = m.Email,
+                        Email = m.Email,
+                        FullName = m.FullName,
+                        EmailConfirmed = true
+                    };
+
+                    var result = await userManager.CreateAsync(user, m.Password);
+                    if (result.Succeeded)
+                    {
+                        await userManager.AddToRoleAsync(user, "Manager");
+                    }
                 }
             }
         }

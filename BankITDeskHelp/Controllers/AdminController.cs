@@ -188,5 +188,15 @@ namespace BankITDeskHelp.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
         }
+
+        // POST: /Admin/EnsureManagers - creates demo managers if missing
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EnsureManagers()
+        {
+            await BankITDeskHelp.Data.SeedData.SeedManagerUserAsync(_userManager);
+            TempData["Message"] = "Ensured demo managers exist.";
+            return RedirectToAction("Index");
+        }
     }
 }

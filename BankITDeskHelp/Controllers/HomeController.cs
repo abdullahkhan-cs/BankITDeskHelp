@@ -15,6 +15,19 @@ namespace BankITDeskHelp.Controllers
 
         public IActionResult Index()
         {
+            // If the user is authenticated, send them to their role dashboard.
+            if (User?.Identity?.IsAuthenticated == true)
+            {
+                if (User.IsInRole("Admin"))
+                    return RedirectToAction("Index", "Admin");
+                if (User.IsInRole("Manager"))
+                    return RedirectToAction("Index", "Manager");
+
+                // Authenticated non-admin users can go to the Complaint creation page
+                return RedirectToAction("Create", "Complaint");
+            }
+
+            // Anonymous users should see the public landing page (Home/Index)
             return View();
         }
 

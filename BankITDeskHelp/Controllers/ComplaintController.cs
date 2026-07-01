@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using BankITDeskHelp.Data;
 using BankITDeskHelp.Models;
 using BankITDeskHelp.ViewModels;
@@ -10,11 +11,13 @@ namespace BankITDeskHelp.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _env;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public ComplaintController(ApplicationDbContext context, IWebHostEnvironment env)
+        public ComplaintController(ApplicationDbContext context, IWebHostEnvironment env, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _env = env;
+            _userManager = userManager;
         }
 
         // GET: /Complaint/Create
@@ -62,6 +65,38 @@ namespace BankITDeskHelp.Controllers
             _context.Complaints.Add(complaint);
             await _context.SaveChangesAsync();
 
+            // Automatic assignment: pick a manager with the fewest open tickets
+            var managers = await _userManager.GetUsersInRoleAsync("Manager");
+            ApplicationUser? selectedManager = null;
+            if (managers != null && managers.Count > 0)
+            {
+                int bestCount = int.MaxValue;
+                foreach (var m in managers)
+                {
+                    var count = await _context.Complaints.CountAsync(c => c.AssignedManagerId == m.Id && c.Status != ComplaintStatus.Closed);
+                    if (count < bestCount)
+                    {
+                        bestCount = count;
+                        selectedManager = m;
+                    }
+                }
+            }
+
+            if (selectedManager != null)
+            {
+                complaint.AssignedManagerId = selectedManager.Id;
+                complaint.Status = ComplaintStatus.Assigned;
+                complaint.AssignedAt = DateTime.Now;
+
+                _context.ComplaintHistories.Add(new ComplaintHistory
+                {
+                    ComplaintId = complaint.Id,
+                    Action = "Assigned to Manager",
+                    Details = $"Automatically assigned to {selectedManager.FullName}",
+                    Timestamp = DateTime.Now
+                });
+            }
+
             // Handle file attachment
             if (vm.Attachment != null && vm.Attachment.Length > 0)
             {
@@ -84,14 +119,17 @@ namespace BankITDeskHelp.Controllers
                 });
             }
 
-            // Record history entry
-            _context.ComplaintHistories.Add(new ComplaintHistory
+            // Record creation history if not already recorded by assignment
+            if (!(_context.ComplaintHistories.Any(h => h.ComplaintId == complaint.Id && h.Action == "Complaint Created")))
             {
-                ComplaintId = complaint.Id,
-                Action = "Complaint Created",
-                Details = $"Submitted by {complaint.EmployeeName}",
-                Timestamp = DateTime.Now
-            });
+                _context.ComplaintHistories.Add(new ComplaintHistory
+                {
+                    ComplaintId = complaint.Id,
+                    Action = "Complaint Created",
+                    Details = $"Submitted by {complaint.EmployeeName}",
+                    Timestamp = DateTime.Now
+                });
+            }
 
             await _context.SaveChangesAsync();
 

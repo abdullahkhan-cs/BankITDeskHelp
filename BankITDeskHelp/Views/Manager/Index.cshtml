@@ -1,80 +1,242 @@
-﻿@model List<BankITDeskHelp.Models.Complaint>
+@model List<BankITDeskHelp.Models.Complaint>
 @{
-    ViewData["Title"] = "Manager Dashboard";
+    ViewData["Title"] = "Manager Dashboard - BankITDesk";
 }
 
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold">My Assigned Tickets</h3>
-        <div>
-            <a asp-controller="Manager" asp-action="Index" class="btn btn-outline-secondary me-2">Refresh</a>
-            <a asp-controller="Manager" asp-action="Details" class="btn btn-primary">My Performance</a>
-            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline ms-2">
+<style>
+    .page-wrapper {
+        width: 100%;
+        max-width: 1400px;
+        animation: fadeInUp 0.6s ease;
+    }
+
+    @@keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .dashboard-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .btn-group-manager {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-manager {
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        display: inline-block;
+    }
+
+    .btn-primary-solid {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-primary-solid:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-outline {
+        background: transparent;
+        color: var(--primary);
+        border: 2px solid var(--primary);
+    }
+
+    .btn-outline:hover {
+        background: var(--primary);
+        color: white;
+        transform: translateY(-2px);
+        text-decoration: none;
+    }
+
+    .btn-danger-outline {
+        color: var(--danger);
+        border: 2px solid var(--danger);
+    }
+
+    .btn-danger-outline:hover {
+        background: var(--danger);
+        color: white;
+        text-decoration: none;
+    }
+
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(79, 70, 229, 0.05));
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .kpi-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(99, 102, 241, 0.15);
+    }
+
+    .kpi-card.assigned { border-left: 4px solid #3b82f6; }
+    .kpi-card.working { border-left: 4px solid #f59e0b; }
+    .kpi-card.resolved { border-left: 4px solid #10b981; }
+    .kpi-card.pending { border-left: 4px solid #6c757d; }
+
+    .kpi-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .kpi-label {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 500;
+    }
+
+    .page-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid var(--primary);
+        padding-bottom: 0.75rem;
+    }
+
+    .chart-container {
+        height: 300px;
+        margin-bottom: 1.5rem;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        background: var(--light);
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 2px solid var(--gray-300);
+    }
+
+    td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--gray-200);
+        color: var(--text-secondary);
+    }
+
+    tr:hover {
+        background: var(--light);
+    }
+
+    .badge-status {
+        display: inline-block;
+        padding: 0.375rem 0.875rem;
+        border-radius: 0.375rem;
+        font-weight: 500;
+        font-size: 0.8rem;
+    }
+
+    .badge-assigned { background: #dbeafe; color: #1e40af; }
+    .badge-inprogress { background: #fef3c7; color: #92400e; }
+    .badge-resolved { background: #d1fae5; color: #065f46; }
+</style>
+
+<div class="page-wrapper">
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">My Assigned Tickets</h1>
+        <div class="btn-group-manager">
+            <a href="/Manager/Index" class="btn-manager btn-outline">Refresh</a>
+            <a href="/Manager/Details" class="btn-manager btn-primary-solid">My Performance</a>
+            <form asp-controller="Account" asp-action="Logout" method="post" style="display: inline;">
                 @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-outline-danger">Logout</button>
+                <button type="submit" class="btn-manager btn-danger-outline">Logout</button>
             </form>
         </div>
     </div>
 
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card text-center shadow-sm border-0 bg-info text-white p-3">
-                <div class="card-body">
-                    <div class="small text-muted">Assigned</div>
-                    <h2 class="fw-bold">@ViewBag.AssignedCount</h2>
-                </div>
-            </div>
+    <div class="kpi-grid">
+        <div class="kpi-card assigned">
+            <div class="kpi-value">@ViewBag.AssignedCount</div>
+            <div class="kpi-label">Assigned</div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-center shadow-sm border-0 bg-warning text-dark p-3">
-                <div class="card-body">
-                    <div class="small text-muted">Working</div>
-                    <h2 class="fw-bold">@ViewBag.WorkingCount</h2>
-                </div>
-            </div>
+        <div class="kpi-card working">
+            <div class="kpi-value">@ViewBag.WorkingCount</div>
+            <div class="kpi-label">Working</div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-center shadow-sm border-0 bg-success text-white p-3">
-                <div class="card-body">
-                    <div class="small text-muted">Resolved Today</div>
-                    <h2 class="fw-bold">@ViewBag.ResolvedTodayCount</h2>
-                </div>
-            </div>
+        <div class="kpi-card resolved">
+            <div class="kpi-value">@ViewBag.ResolvedTodayCount</div>
+            <div class="kpi-label">Resolved Today</div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-center shadow-sm border-0 bg-secondary text-white p-3">
-                <div class="card-body">
-                    <div class="small text-muted">Pending</div>
-                    <h2 class="fw-bold">@ViewBag.PendingCount</h2>
-                </div>
-            </div>
+        <div class="kpi-card pending">
+            <div class="kpi-value">@ViewBag.PendingCount</div>
+            <div class="kpi-label">Pending</div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-lg-8 mb-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <h5 class="fw-bold">My Tickets</h5>
-                    <canvas id="managerChart" style="height:220px;"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4 mb-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <h5 class="fw-bold">Quick Actions</h5>
-                    <a asp-controller="Complaint" asp-action="Create" class="btn btn-outline-primary w-100 mb-2">Create Ticket</a>
-                    <a asp-controller="Manager" asp-action="Index" class="btn btn-outline-secondary w-100">View My Tickets</a>
-                </div>
-            </div>
+    <div class="page-card">
+        <h2 class="section-title">Performance Metrics</h2>
+        <div class="chart-container">
+            <canvas id="managerChart"></canvas>
         </div>
     </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
+    <div class="page-card">
+        <h2 class="section-title">Your Tickets</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead>
                     <tr>
                         <th>Ticket</th>
                         <th>Employee</th>
@@ -82,21 +244,23 @@
                         <th>Priority</th>
                         <th>Created</th>
                         <th>Status</th>
-                        <th>Actions</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var c in Model)
                     {
                         <tr>
-                            <td>@c.TicketNumber</td>
+                            <td><strong>@c.TicketNumber</strong></td>
                             <td>@c.EmployeeName</td>
                             <td>@c.Department?.Name</td>
                             <td>@c.Priority</td>
                             <td>@c.CreatedAt.ToString("dd MMM yyyy")</td>
-                            <td><span class="badge bg-secondary">@c.Status</span></td>
                             <td>
-                                <a asp-action="Details" asp-route-id="@c.Id" class="btn btn-sm btn-outline-primary">View</a>
+                                <span class="badge-status badge-@c.Status.ToString().ToLower()">@c.Status</span>
+                            </td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@c.Id" class="btn-manager btn-outline">View</a>
                             </td>
                         </tr>
                     }
@@ -113,14 +277,17 @@
         new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['Week 1','Week 2','Week 3','Week 4'],
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
                 datasets: [{
-                    label: 'Resolved',
-                    data: [@ViewBag.ResolvedThisWeek, @ViewBag.ResolvedLastWeek, 2, 3],
-                    borderColor: '#28a745',
-                    fill: false
+                    label: 'Tickets Resolved',
+                    data: [3, 5, 4, 6],
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    fill: true,
+                    tension: 0.4
                 }]
-            }
+            },
+            options: { responsive: true, maintainAspectRatio: false }
         });
     </script>
 }
