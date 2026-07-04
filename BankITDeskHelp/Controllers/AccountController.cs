@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using BankITDeskHelp.Models;
 using BankITDeskHelp.ViewModels;
+using BankITDeskHelp.Constants;
 
 namespace BankITDeskHelp.Controllers
 {
@@ -47,9 +48,9 @@ namespace BankITDeskHelp.Controllers
             var user = await _userManager.FindByEmailAsync(vm.Email);
             var roles = await _userManager.GetRolesAsync(user!);
 
-            if (roles.Contains("Admin"))
+            if (roles.Contains(Roles.Admin))
                 return RedirectToAction("Index", "Admin");
-            if (roles.Contains("Manager"))
+            if (roles.Contains(Roles.Manager))
                 return RedirectToAction("Index", "Manager");
 
             return RedirectToAction("Index", "Home");

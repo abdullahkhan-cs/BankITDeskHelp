@@ -1,0 +1,26 @@
+@* KPI Card Component - Dashboard Metrics *@
+@{
+    var label = ViewData["label"]?.ToString() ?? "Metric";
+    var value = ViewData["value"]?.ToString() ?? "0";
+    var change = ViewData["change"]?.ToString();
+    var changeType = ViewData["changeType"]?.ToString(); // "positive" or "negative"
+    var icon = ViewData["icon"]?.ToString();
+}
+
+<div class="kpi-card">
+    @if (!string.IsNullOrEmpty(icon))
+    {
+        <div class="mb-3">
+            <i class="@icon" style="font-size: 1.5rem; color: var(--color-primary-600);"></i>
+        </div>
+    }
+    <div class="kpi-label">@label</div>
+    <div class="kpi-value">@value</div>
+    @if (!string.IsNullOrEmpty(change))
+    {
+        <div class="kpi-change @(changeType == "positive" ? "positive" : "negative")">
+            <i class="@(changeType == "positive" ? "bi bi-arrow-up-short" : "bi bi-arrow-down-short")"></i>
+            @change
+        </div>
+    }
+</div>

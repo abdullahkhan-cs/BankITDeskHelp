@@ -3,45 +3,68 @@
     ViewData["Title"] = "Assign Complaint";
 }
 
-<div class="container py-4">
-    <h3 class="fw-bold mb-4">Assign Complaint — @Model.TicketNumber</h3>
+<div class="page-header">
+    <h1>Assign Complaint — @Model.TicketNumber</h1>
+    <p class="page-header-subtitle">Assign this ticket to a manager for resolution</p>
+</div>
 
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body">
-            <div class="row mb-2">
-                <div class="col-md-4"><strong>Employee:</strong> @Model.EmployeeName</div>
-                <div class="col-md-4"><strong>Department:</strong> @Model.DepartmentName</div>
-                <div class="col-md-4"><strong>Priority:</strong> @Model.Priority</div>
+<div class="card mb-xl">
+    <div class="card-header">
+        <h3 class="mb-0">Ticket Details</h3>
+    </div>
+    <div class="card-body">
+        <div class="grid grid-cols-3 gap-lg mb-lg">
+            <div>
+                <small class="text-muted">Employee</small>
+                <div class="font-weight-semibold">@Model.EmployeeName</div>
             </div>
-            <div><strong>Description:</strong> @Model.Description</div>
+            <div>
+                <small class="text-muted">Department</small>
+                <div class="font-weight-semibold">@Model.DepartmentName</div>
+            </div>
+            <div>
+                <small class="text-muted">Priority</small>
+                <div class="font-weight-semibold">@Model.Priority</div>
+            </div>
+        </div>
+        <div>
+            <small class="text-muted">Description</small>
+            <div>@Model.Description</div>
         </div>
     </div>
+</div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
-            <form asp-action="Assign" method="post">
-                <input type="hidden" asp-for="ComplaintId" />
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+<div class="card">
+    <div class="card-header">
+        <h3 class="mb-0">Assign to Manager</h3>
+    </div>
+    <div class="card-body">
+        <form asp-action="Assign" method="post">
+            <input type="hidden" asp-for="ComplaintId" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
-                <div class="mb-3">
-                    <label class="form-label">Assign to Manager</label>
-                    <select asp-for="SelectedManagerId" class="form-select">
-                        <option value="">-- Select Manager --</option>
-                        @foreach (var m in Model.Managers ?? new List<BankITDeskHelp.Models.ApplicationUser>())
-                        {
-                            <option value="@m.Id">@m.FullName (@m.Email)</option>
-                        }
-                    </select>
-                </div>
+            <div class="form-group mb-lg">
+                <label asp-for="SelectedManagerId" class="form-label">Select Manager <span class="text-danger">*</span></label>
+                <select asp-for="SelectedManagerId" class="form-select" required>
+                    <option value="">-- Select Manager --</option>
+                    @foreach (var m in Model.Managers ?? new List<BankITDeskHelp.Models.ApplicationUser>())
+                    {
+                        <option value="@m.Id">@m.FullName (@m.Email)</option>
+                    }
+                </select>
+                <span asp-validation-for="SelectedManagerId" class="invalid-feedback"></span>
+            </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Remarks (optional)</label>
-                    <textarea asp-for="Remarks" class="form-control" rows="2"></textarea>
-                </div>
+            <div class="form-group mb-lg">
+                <label asp-for="Remarks" class="form-label">Remarks (optional)</label>
+                <textarea asp-for="Remarks" class="form-control" rows="3" placeholder="Add any notes for the manager..."></textarea>
+                <span asp-validation-for="Remarks" class="invalid-feedback"></span>
+            </div>
 
+            <div class="flex gap-md">
                 <button type="submit" class="btn btn-primary">Assign Ticket</button>
-                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
-            </form>
-        </div>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
     </div>
 </div>

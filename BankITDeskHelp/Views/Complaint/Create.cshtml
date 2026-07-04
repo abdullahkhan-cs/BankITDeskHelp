@@ -3,255 +3,53 @@
     ViewData["Title"] = "Lodge a Complaint - BankITDesk";
 }
 
-<style>
-    .page-wrapper {
-        width: 100%;
-        max-width: 900px;
-        animation: fadeInUp 0.6s ease;
-    }
+<div class="page-header">
+    <h1>Lodge a Complaint</h1>
+    <p class="page-header-subtitle">Submit a new IT support ticket to our team</p>
+</div>
 
-    @@keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .page-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border-radius: 1.5rem;
-        padding: 2rem;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.5);
-    }
-
-    .form-header {
-        text-align: center;
-        margin-bottom: 2rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 2px solid var(--primary);
-    }
-
-    .form-title {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: 0.5rem;
-    }
-
-    .form-subtitle {
-        font-size: 0.95rem;
-        color: var(--text-secondary);
-    }
-
-    .form-group {
-        margin-bottom: 1.25rem;
-    }
-
-    .form-group-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 1.25rem;
-    }
-
-    .form-label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        color: var(--text-primary);
-        font-size: 0.95rem;
-    }
-
-    .form-required {
-        color: var(--danger);
-        margin-left: 0.25rem;
-    }
-
-    .form-control, .form-select {
-        width: 100%;
-        padding: 0.875rem 1rem;
-        border: 2px solid var(--gray-300);
-        border-radius: 0.75rem;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        font-family: inherit;
-    }
-
-    .form-control:focus, .form-select:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-    }
-
-    textarea.form-control {
-        resize: vertical;
-        min-height: 120px;
-    }
-
-    .form-hint {
-        font-size: 0.85rem;
-        color: var(--text-secondary);
-        margin-top: 0.25rem;
-    }
-
-    .file-upload {
-        position: relative;
-    }
-
-    .file-input {
-        position: absolute;
-        left: -9999px;
-    }
-
-    .file-label {
-        display: inline-block;
-        padding: 0.75rem 1.25rem;
-        background: var(--light);
-        border: 2px dashed var(--primary);
-        border-radius: 0.75rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        color: var(--primary);
-        font-weight: 500;
-    }
-
-    .file-label:hover {
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(79, 70, 229, 0.05));
-    }
-
-    .file-name {
-        font-size: 0.85rem;
-        color: var(--text-secondary);
-        margin-top: 0.5rem;
-    }
-
-    .form-actions {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-        flex-wrap: wrap;
-        margin-top: 2rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid var(--gray-200);
-    }
-
-    .btn-submit {
-        padding: 0.875rem 2rem;
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        color: white;
-        border: none;
-        border-radius: 0.75rem;
-        font-weight: 600;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-    }
-
-    .btn-submit:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
-    }
-
-    .btn-cancel {
-        padding: 0.875rem 2rem;
-        background: transparent;
-        color: var(--primary);
-        border: 2px solid var(--primary);
-        border-radius: 0.75rem;
-        font-weight: 600;
-        text-decoration: none;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .btn-cancel:hover {
-        background: var(--primary);
-        color: white;
-        text-decoration: none;
-    }
-
-    .alert {
-        padding: 1rem;
-        border-radius: 0.75rem;
-        margin-bottom: 1rem;
-        font-size: 0.9rem;
-    }
-
-    .alert-danger {
-        background: #fee2e2;
-        color: #991b1b;
-        border: 1px solid #fecaca;
-    }
-
-    .section-divider {
-        height: 2px;
-        background: linear-gradient(135deg, transparent, var(--primary), transparent);
-        margin: 2rem 0;
-    }
-</style>
-
-<div class="page-wrapper">
-    <div class="page-card">
-        <div class="form-header">
-            <h1 class="form-title">Lodge a Complaint</h1>
-            <p class="form-subtitle">Fill in the details below to submit your complaint to our support team</p>
-        </div>
-
+<div class="card">
+    <div class="card-body">
         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
-        <form asp-action="Create" method="post" enctype="multipart/form-data" novalidate>
-            <!-- Personal Information Section -->
-            <h3 style="color: var(--text-primary); margin-bottom: 1rem; font-weight: 600;">Personal Information</h3>
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+            <h4 class="mb-lg font-weight-semibold">Personal Information</h4>
+            <hr class="mb-lg" />
 
-            <div class="form-group-row">
+            <div class="grid grid-cols-2 gap-lg mb-lg">
                 <div class="form-group">
-                    <label class="form-label">
-                        Employee Name
-                        <span class="form-required">*</span>
-                    </label>
+                    <label asp-for="EmployeeName" class="form-label">Employee Name <span class="text-danger">*</span></label>
                     <input asp-for="EmployeeName" class="form-control" placeholder="John Doe" required />
-                    <span asp-validation-for="EmployeeName" style="color: var(--danger); font-size: 0.85rem;"></span>
+                    <span asp-validation-for="EmployeeName" class="invalid-feedback"></span>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">
-                        Employee ID
-                        <span class="form-required">*</span>
-                    </label>
+                    <label asp-for="EmployeeId" class="form-label">Employee ID <span class="text-danger">*</span></label>
                     <input asp-for="EmployeeId" class="form-control" placeholder="EMP12345" required />
-                    <span asp-validation-for="EmployeeId" style="color: var(--danger); font-size: 0.85rem;"></span>
+                    <span asp-validation-for="EmployeeId" class="invalid-feedback"></span>
                 </div>
             </div>
 
-            <div class="form-group-row">
+            <div class="grid grid-cols-2 gap-lg mb-lg">
                 <div class="form-group">
-                    <label class="form-label">
-                        Email Address
-                        <span class="form-required">*</span>
-                    </label>
-                    <input asp-for="Email" type="email" class="form-control" placeholder="your@email.com" required />
-                    <span asp-validation-for="Email" style="color: var(--danger); font-size: 0.85rem;"></span>
+                    <label asp-for="Email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                    <input asp-for="Email" type="email" class="form-control" placeholder="your.email@bank.com" required />
+                    <span asp-validation-for="Email" class="invalid-feedback"></span>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Phone Number</label>
-                    <input asp-for="Phone" type="tel" class="form-control" placeholder="+1 (555) 000-0000" />
-                    <span asp-validation-for="Phone" style="color: var(--danger); font-size: 0.85rem;"></span>
+                    <label asp-for="Phone" class="form-label">Phone Number</label>
+                    <input asp-for="Phone" type="tel" class="form-control" placeholder="Extension or mobile number" />
+                    <span asp-validation-for="Phone" class="invalid-feedback"></span>
                 </div>
             </div>
 
-            <div class="section-divider"></div>
+            <h4 class="mb-lg font-weight-semibold">Location Information</h4>
+            <hr class="mb-lg" />
 
-            <!-- Location Information Section -->
-            <h3 style="color: var(--text-primary); margin-bottom: 1rem; font-weight: 600;">Location Information</h3>
-
-            <div class="form-group-row">
+            <div class="grid grid-cols-2 gap-lg mb-lg">
                 <div class="form-group">
-                    <label class="form-label">
-                        Department
-                        <span class="form-required">*</span>
-                    </label>
+                    <label asp-for="DepartmentId" class="form-label">Department <span class="text-danger">*</span></label>
                     <select asp-for="DepartmentId" class="form-select" required>
                         <option value="">-- Select Department --</option>
                         @foreach (var dept in ViewBag.Departments ?? new List<dynamic>())
@@ -259,14 +57,11 @@
                             <option value="@dept.Id">@dept.Name</option>
                         }
                     </select>
-                    <span asp-validation-for="DepartmentId" style="color: var(--danger); font-size: 0.85rem;"></span>
+                    <span asp-validation-for="DepartmentId" class="invalid-feedback"></span>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">
-                        Branch
-                        <span class="form-required">*</span>
-                    </label>
+                    <label asp-for="BranchId" class="form-label">Branch <span class="text-danger">*</span></label>
                     <select asp-for="BranchId" class="form-select" required>
                         <option value="">-- Select Branch --</option>
                         @foreach (var branch in ViewBag.Branches ?? new List<dynamic>())
@@ -274,61 +69,40 @@
                             <option value="@branch.Id">@branch.Name</option>
                         }
                     </select>
-                    <span asp-validation-for="BranchId" style="color: var(--danger); font-size: 0.85rem;"></span>
+                    <span asp-validation-for="BranchId" class="invalid-feedback"></span>
                 </div>
             </div>
 
-            <div class="section-divider"></div>
+            <h4 class="mb-lg font-weight-semibold">Complaint Details</h4>
+            <hr class="mb-lg" />
 
-            <!-- Complaint Details Section -->
-            <h3 style="color: var(--text-primary); margin-bottom: 1rem; font-weight: 600;">Complaint Details</h3>
-
-            <div class="form-group">
-                <label class="form-label">
-                    Subject
-                    <span class="form-required">*</span>
-                </label>
-                <input asp-for="Subject" class="form-control" maxlength="200" placeholder="Brief summary of your issue" required />
-                <span asp-validation-for="Subject" style="color: var(--danger); font-size: 0.85rem;"></span>
-                <div class="form-hint">Max 200 characters</div>
+            <div class="form-group mb-lg">
+                <label asp-for="Subject" class="form-label">Subject <span class="text-danger">*</span></label>
+                <input asp-for="Subject" class="form-control" maxlength="200" placeholder="Brief summary of the issue" required />
+                <span asp-validation-for="Subject" class="invalid-feedback"></span>
+                <small class="text-muted">Max 200 characters</small>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">
-                    Description
-                    <span class="form-required">*</span>
-                </label>
-                <textarea asp-for="Description" class="form-control" placeholder="Provide detailed information about your complaint..." required></textarea>
-                <span asp-validation-for="Description" style="color: var(--danger); font-size: 0.85rem;"></span>
-                <div class="form-hint">Please be as detailed as possible</div>
+            <div class="form-group mb-lg">
+                <label asp-for="Description" class="form-label">Description <span class="text-danger">*</span></label>
+                <textarea asp-for="Description" class="form-control" rows="4" placeholder="Provide detailed information about the issue..." required></textarea>
+                <span asp-validation-for="Description" class="invalid-feedback"></span>
+                <small class="text-muted">Please be as detailed as possible</small>
             </div>
 
-            <div class="form-group">
+            <div class="form-group mb-lg">
                 <label class="form-label">Attachment</label>
-                <div class="file-upload">
-                    <input type="file" id="attachment" name="Attachment" class="file-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg" />
-                    <label for="attachment" class="file-label">
-                        📎 Click to upload or drag file here
-                    </label>
-                    <div class="form-hint">Supported formats: PDF, DOC, XLS, PNG, JPG (Max 5MB)</div>
-                    <div class="file-name" id="fileName"></div>
-                </div>
+                <input type="file" name="Attachment" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg" />
+                <small class="text-muted">Supported formats: PDF, DOC, XLS, PNG, JPG (Max 5MB)</small>
             </div>
 
-            <div class="form-actions">
-                <button type="submit" class="btn-submit">Submit Complaint</button>
-                <a href="/" class="btn-cancel">Cancel</a>
+            <div class="flex justify-center gap-md mt-xl pt-lg border-top">
+                <button type="submit" class="btn btn-primary btn-lg">Submit Complaint</button>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-secondary btn-lg">Cancel</a>
             </div>
         </form>
     </div>
 </div>
-
-<script>
-    document.getElementById('attachment').addEventListener('change', function(e) {
-        const fileName = e.target.files[0]?.name;
-        document.getElementById('fileName').textContent = fileName ? `Selected: ${fileName}` : '';
-    });
-</script>
 
 @section Scripts {
     @{

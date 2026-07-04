@@ -4,234 +4,50 @@
     Layout = "_Layout";
 }
 
-<style>
-    .login-container {
-        width: 100%;
-        max-width: 420px;
-        animation: slideInUp 0.6s ease;
-    }
-
-    @@keyframes slideInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .login-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border-radius: 1.5rem;
-        padding: 2.5rem;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.5);
-    }
-
-    .login-header {
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-
-    .login-title {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: 0.5rem;
-    }
-
-    .login-subtitle {
-        font-size: 0.95rem;
-        color: var(--text-secondary);
-    }
-
-    .form-group {
-        margin-bottom: 1.25rem;
-    }
-
-    .form-label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        color: var(--text-primary);
-        font-size: 0.95rem;
-    }
-
-    .form-control {
-        width: 100%;
-        padding: 0.875rem 1rem;
-        border: 2px solid var(--gray-300);
-        border-radius: 0.75rem;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        font-family: inherit;
-    }
-
-    .form-control:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-    }
-
-    .form-check {
-        display: flex;
-        align-items: center;
-        margin-bottom: 1rem;
-    }
-
-    .form-check-input {
-        width: 1.25rem;
-        height: 1.25rem;
-        margin-right: 0.75rem;
-        cursor: pointer;
-        accent-color: var(--primary);
-    }
-
-    .form-check-label {
-        cursor: pointer;
-        user-select: none;
-        color: var(--text-secondary);
-        font-size: 0.95rem;
-    }
-
-    .form-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-
-    .forgot-link {
-        color: var(--primary);
-        text-decoration: none;
-        font-weight: 500;
-        transition: color 0.3s ease;
-    }
-
-    .forgot-link:hover {
-        color: var(--primary-dark);
-        text-decoration: underline;
-    }
-
-    .btn-signin {
-        width: 100%;
-        padding: 0.875rem;
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        color: white;
-        border: none;
-        border-radius: 0.75rem;
-        font-weight: 600;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-    }
-
-    .btn-signin:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
-    }
-
-    .divider {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin: 1.5rem 0;
-        color: var(--text-secondary);
-        font-size: 0.9rem;
-    }
-
-    .divider::before,
-    .divider::after {
-        content: '';
-        flex: 1;
-        height: 1px;
-        background: var(--gray-300);
-    }
-
-    .btn-group-alt {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-    }
-
-    .btn-alt {
-        padding: 0.75rem;
-        border: 2px solid var(--gray-300);
-        background: transparent;
-        border-radius: 0.75rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        color: var(--text-secondary);
-    }
-
-    .btn-alt:hover {
-        border-color: var(--primary);
-        color: var(--primary);
-        background: var(--light);
-    }
-
-    .alert {
-        padding: 1rem;
-        border-radius: 0.75rem;
-        margin-bottom: 1rem;
-        font-size: 0.9rem;
-    }
-
-    .alert-danger {
-        background: #fee2e2;
-        color: #991b1b;
-        border: 1px solid #fecaca;
-    }
-</style>
-
-<div class="login-container">
-    <div class="login-card">
-        <div class="login-header">
-            <h1 class="login-title">Welcome Back</h1>
-            <p class="login-subtitle">Sign in to access your dashboard</p>
-        </div>
-
-        <form asp-action="Login" method="post" novalidate>
-            <input type="hidden" name="returnUrl" value="@(ViewData["ReturnUrl"] ?? string.Empty)" />
-
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-
-            <div class="form-group">
-                <label class="form-label">Email Address</label>
-                <input asp-for="Email" class="form-control" placeholder="your@email.com" />
-                <span asp-validation-for="Email" style="color: var(--danger); font-size: 0.85rem;"></span>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Password</label>
-                <input asp-for="Password" class="form-control" placeholder="••••••••" />
-                <span asp-validation-for="Password" style="color: var(--danger); font-size: 0.85rem;"></span>
-            </div>
-
-            <div class="form-footer">
-                <div class="form-check">
-                    <input asp-for="RememberMe" class="form-check-input" id="rememberMe" />
-                    <label class="form-check-label" for="rememberMe">Remember me</label>
+<div class="d-flex align-items-center justify-content-center" style="min-height: 80vh;">
+    <div style="width: 100%; max-width: 420px;">
+        <div class="card">
+            <div class="card-body p-xl">
+                <div class="text-center mb-xl">
+                    <h2 class="mb-sm">Sign In</h2>
+                    <p class="text-muted mb-0">BankITDesk IT Support Portal</p>
                 </div>
-                <a href="#" class="forgot-link">Forgot password?</a>
+
+                <form asp-action="Login" method="post">
+                    <input type="hidden" name="returnUrl" value="@(ViewData["ReturnUrl"] ?? string.Empty)" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="form-group mb-lg">
+                        <label asp-for="Email" class="form-label">Email Address</label>
+                        <input asp-for="Email" class="form-control" placeholder="your.email@bank.com" />
+                        <span asp-validation-for="Email" class="invalid-feedback"></span>
+                    </div>
+
+                    <div class="form-group mb-lg">
+                        <label asp-for="Password" class="form-label">Password</label>
+                        <input asp-for="Password" class="form-control" type="password" placeholder="••••••••" />
+                        <span asp-validation-for="Password" class="invalid-feedback"></span>
+                    </div>
+
+                    <div class="flex justify-between items-center mb-lg">
+                        <div class="form-check">
+                            <input asp-for="RememberMe" class="form-check-input" id="rememberMe" />
+                            <label class="form-check-label" for="rememberMe">Remember me</label>
+                        </div>
+                        <a href="#" class="text-sm text-decoration-none">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 btn-lg">Sign In</button>
+                </form>
+
+                <div class="text-center mt-xl">
+                    <p class="text-muted text-sm mb-0">
+                        Need assistance? Contact <a href="#" class="text-decoration-none">IT Support</a>
+                    </p>
+                </div>
             </div>
-
-            <button type="submit" class="btn-signin">Sign In</button>
-
-            <div class="divider">Or continue with</div>
-
-            <div class="btn-group-alt">
-                <button type="button" class="btn-alt">SSO</button>
-                <button type="button" class="btn-alt">Staff ID</button>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 

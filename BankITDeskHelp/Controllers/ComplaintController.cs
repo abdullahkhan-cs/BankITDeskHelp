@@ -45,95 +45,133 @@ namespace BankITDeskHelp.Controllers
                 return View(vm);
             }
 
-            var complaint = new Complaint
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                TicketNumber = await GenerateTicketNumberAsync(),
-                EmployeeName = vm.EmployeeName,
-                EmployeeId = vm.EmployeeId,
-                Email = vm.Email,
-                Phone = vm.Phone,
-                BranchId = vm.BranchId,
-                DepartmentId = vm.DepartmentId,
-                CategoryId = vm.CategoryId,
-                Priority = vm.Priority,
-                Subject = vm.Subject,
-                Description = vm.Description,
-                Status = ComplaintStatus.New,
-                CreatedAt = DateTime.Now
-            };
-
-            _context.Complaints.Add(complaint);
-            await _context.SaveChangesAsync();
-
-            // Automatic assignment: pick a manager with the fewest open tickets
-            var managers = await _userManager.GetUsersInRoleAsync("Manager");
-            ApplicationUser? selectedManager = null;
-            if (managers != null && managers.Count > 0)
-            {
-                int bestCount = int.MaxValue;
-                foreach (var m in managers)
+                var complaint = new Complaint
                 {
-                    var count = await _context.Complaints.CountAsync(c => c.AssignedManagerId == m.Id && c.Status != ComplaintStatus.Closed);
-                    if (count < bestCount)
+                    TicketNumber = await GenerateTicketNumberAsync(),
+                    EmployeeName = vm.EmployeeName,
+                    EmployeeId = vm.EmployeeId,
+                    Email = vm.Email,
+                    Phone = vm.Phone,
+                    BranchId = vm.BranchId,
+                    DepartmentId = vm.DepartmentId,
+                    CategoryId = vm.CategoryId,
+                    Priority = vm.Priority,
+                    Subject = vm.Subject,
+                    Description = vm.Description,
+                    Status = ComplaintStatus.New,
+                    CreatedAt = DateTime.Now
+                };
+
+                _context.Complaints.Add(complaint);
+                await _context.SaveChangesAsync();
+
+                // Automatic assignment: pick a manager with the fewest open tickets in the same department
+                var managers = await _userManager.GetUsersInRoleAsync("Manager");
+                ApplicationUser? selectedManager = null;
+                if (managers != null && managers.Count > 0)
+                {
+                    // Filter managers by department
+                    var departmentManagers = managers.Where(m => m.DepartmentId == complaint.DepartmentId).ToList();
+
+                    // If no department-specific managers, fall back to all managers
+                    var managerPool = departmentManagers.Any() ? departmentManagers : managers.ToList();
+
+                    // Use single query to get workloads (fix N+1 problem)
+                    var managerWorkloads = await _context.Complaints
+                        .Where(c => c.Status != ComplaintStatus.Closed && managerPool.Select(m => m.Id).Contains(c.AssignedManagerId))
+                        .GroupBy(c => c.AssignedManagerId)
+                        .Select(g => new { ManagerId = g.Key, Count = g.Count() })
+                        .ToListAsync();
+
+                    selectedManager = managerPool
+                        .OrderBy(m => managerWorkloads.FirstOrDefault(w => w.ManagerId == m.Id)?.Count ?? 0)
+                        .FirstOrDefault();
+                }
+
+                if (selectedManager != null)
+                {
+                    complaint.AssignedManagerId = selectedManager.Id;
+                    complaint.Status = ComplaintStatus.Assigned;
+                    complaint.AssignedAt = DateTime.Now;
+
+                    _context.ComplaintHistories.Add(new ComplaintHistory
                     {
-                        bestCount = count;
-                        selectedManager = m;
+                        ComplaintId = complaint.Id,
+                        Action = "Assigned to Manager",
+                        Details = $"Automatically assigned to {selectedManager.FullName}",
+                        Timestamp = DateTime.Now
+                    });
+                }
+
+                // Handle file attachment with security validation
+                if (vm.Attachment != null && vm.Attachment.Length > 0)
+                {
+                    // Validate file size (5MB limit)
+                    if (vm.Attachment.Length > 5 * 1024 * 1024)
+                    {
+                        ModelState.AddModelError("Attachment", "File size exceeds 5MB limit.");
+                        vm.Branches = await _context.Branches.OrderBy(b => b.Name).ToListAsync();
+                        vm.Departments = await _context.Departments.OrderBy(d => d.Name).ToListAsync();
+                        vm.Categories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
+                        return View(vm);
                     }
+
+                    // Validate file type
+                    var allowedExtensions = new[] { ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".png", ".jpg", ".jpeg" };
+                    var extension = Path.GetExtension(vm.Attachment.FileName).ToLowerInvariant();
+                    if (!allowedExtensions.Contains(extension))
+                    {
+                        ModelState.AddModelError("Attachment", "Invalid file type. Allowed types: PDF, DOC, DOCX, XLS, XLSX, PNG, JPG, JPEG.");
+                        vm.Branches = await _context.Branches.OrderBy(b => b.Name).ToListAsync();
+                        vm.Departments = await _context.Departments.OrderBy(d => d.Name).ToListAsync();
+                        vm.Categories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
+                        return View(vm);
+                    }
+
+                    var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
+                    Directory.CreateDirectory(uploadsFolder);
+
+                    var uniqueFileName = $"{Guid.NewGuid()}_{vm.Attachment.FileName}";
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await vm.Attachment.CopyToAsync(stream);
+                    }
+
+                    _context.Attachments.Add(new Attachment
+                    {
+                        ComplaintId = complaint.Id,
+                        FileName = vm.Attachment.FileName,
+                        FilePath = $"/uploads/{uniqueFileName}"
+                    });
                 }
-            }
 
-            if (selectedManager != null)
-            {
-                complaint.AssignedManagerId = selectedManager.Id;
-                complaint.Status = ComplaintStatus.Assigned;
-                complaint.AssignedAt = DateTime.Now;
-
-                _context.ComplaintHistories.Add(new ComplaintHistory
+                // Record creation history if not already recorded by assignment
+                if (!(_context.ComplaintHistories.Any(h => h.ComplaintId == complaint.Id && h.Action == "Complaint Created")))
                 {
-                    ComplaintId = complaint.Id,
-                    Action = "Assigned to Manager",
-                    Details = $"Automatically assigned to {selectedManager.FullName}",
-                    Timestamp = DateTime.Now
-                });
-            }
-
-            // Handle file attachment
-            if (vm.Attachment != null && vm.Attachment.Length > 0)
-            {
-                var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
-                Directory.CreateDirectory(uploadsFolder);
-
-                var uniqueFileName = $"{Guid.NewGuid()}_{vm.Attachment.FileName}";
-                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await vm.Attachment.CopyToAsync(stream);
+                    _context.ComplaintHistories.Add(new ComplaintHistory
+                    {
+                        ComplaintId = complaint.Id,
+                        Action = "Complaint Created",
+                        Details = $"Submitted by {complaint.EmployeeName}",
+                        Timestamp = DateTime.Now
+                    });
                 }
 
-                _context.Attachments.Add(new Attachment
-                {
-                    ComplaintId = complaint.Id,
-                    FileName = vm.Attachment.FileName,
-                    FilePath = $"/uploads/{uniqueFileName}"
-                });
-            }
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
 
-            // Record creation history if not already recorded by assignment
-            if (!(_context.ComplaintHistories.Any(h => h.ComplaintId == complaint.Id && h.Action == "Complaint Created")))
+                return RedirectToAction("Confirmation", new { ticketNumber = complaint.TicketNumber });
+            }
+            catch
             {
-                _context.ComplaintHistories.Add(new ComplaintHistory
-                {
-                    ComplaintId = complaint.Id,
-                    Action = "Complaint Created",
-                    Details = $"Submitted by {complaint.EmployeeName}",
-                    Timestamp = DateTime.Now
-                });
+                await transaction.RollbackAsync();
+                throw;
             }
-
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("Confirmation", new { ticketNumber = complaint.TicketNumber });
         }
 
         // GET: /Complaint/Confirmation?ticketNumber=IT-2026-00001

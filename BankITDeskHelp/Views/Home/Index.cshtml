@@ -1,278 +1,178 @@
 @{
-    ViewData["Title"] = "BankITDesk - Modern IT Support";
+    ViewData["Title"] = "BankITDesk - IT Support Portal";
 }
 
-<style>
-    .page-wrapper {
-        width: 100%;
-        max-width: 1200px;
-        animation: fadeInUp 0.6s ease;
-    }
-
-    @@keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .page-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border-radius: 2rem;
-        padding: 3rem;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.5);
-    }
-
-    .hero-section {
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-
-    .hero-title {
-        font-size: 2.5rem;
-        font-weight: 800;
-        line-height: 1.2;
-        margin-bottom: 1rem;
-        color: var(--text-primary);
-    }
-
-    .hero-title .highlight {
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-
-    .hero-description {
-        font-size: 1.1rem;
-        color: var(--text-secondary);
-        max-width: 600px;
-        margin: 0 auto 2rem;
-    }
-
-    .btn-group-landing {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-        flex-wrap: wrap;
-        margin: 2rem 0;
-    }
-
-    .btn-primary-gradient {
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        color: white;
-        padding: 0.875rem 2rem;
-        border: none;
-        border-radius: 0.75rem;
-        font-weight: 600;
-        text-decoration: none;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-        display: inline-block;
-    }
-
-    .btn-primary-gradient:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
-        color: white;
-        text-decoration: none;
-    }
-
-    .btn-secondary-outline {
-        background: transparent;
-        color: var(--text-primary);
-        padding: 0.875rem 2rem;
-        border: 2px solid var(--gray-300);
-        border-radius: 0.75rem;
-        font-weight: 600;
-        text-decoration: none;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: inline-block;
-    }
-
-    .btn-secondary-outline:hover {
-        background: var(--light);
-        border-color: var(--primary);
-        color: var(--primary);
-        text-decoration: none;
-        transform: translateY(-2px);
-    }
-
-    .features {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-        margin-top: 2rem;
-    }
-
-    .feature-item {
-        text-align: center;
-    }
-
-    .feature-icon {
-        font-size: 2rem;
-        margin-bottom: 0.5rem;
-    }
-
-    .feature-title {
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        color: var(--text-primary);
-    }
-
-    .feature-desc {
-        font-size: 0.9rem;
-        color: var(--text-secondary);
-    }
-
-    .complaint-form-section {
-        margin-top: 3rem;
-        padding-top: 2rem;
-        border-top: 1px solid var(--gray-200);
-    }
-
-    .complaint-form-section h3 {
-        text-align: center;
-        margin-bottom: 1.5rem;
-        color: var(--text-primary);
-    }
-
-    .form-group-inline {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .form-group {
-        margin-bottom: 1rem;
-    }
-
-    .form-label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-        color: var(--text-primary);
-    }
-
-    .form-control, .form-select {
-        width: 100%;
-        padding: 0.75rem 1rem;
-        border: 2px solid var(--gray-300);
-        border-radius: 0.5rem;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-    }
-
-    .form-control:focus, .form-select:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-    }
-
-    textarea.form-control {
-        resize: vertical;
-        min-height: 100px;
-    }
-</style>
-
-<div class="page-wrapper">
-    <div class="page-card">
-        <div class="hero-section">
-            <h1 class="hero-title">
-                Submit Your Complaint.<br/>
-                <span class="highlight">Get Faster Resolution.</span>
-            </h1>
-            <p class="hero-description">
-                BankITDesk is your one-stop solution for IT support. Create tickets, track progress, and resolve issues quickly with our modern ticketing system.
-            </p>
-
-            <div class="btn-group-landing">
-                <a href="/Account/Login?returnUrl=/Admin/Index" class="btn-primary-gradient">Sign In to Dashboard</a>
-                <a href="#quickComplaint" class="btn-secondary-outline">Lodge a Complaint</a>
+<div class="landing-container">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="badge badge-primary-filled">Enterprise IT Support</span>
             </div>
-
-            <div class="features">
-                <div class="feature-item">
-                    <div class="feature-icon">⚡</div>
-                    <div class="feature-title">Fast Tracking</div>
-                    <div class="feature-desc">Real-time ticket updates</div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon">👥</div>
-                    <div class="feature-title">Expert Support</div>
-                    <div class="feature-desc">Dedicated managers</div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon">📊</div>
-                    <div class="feature-title">Analytics</div>
-                    <div class="feature-desc">Performance reports</div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-icon">🔒</div>
-                    <div class="feature-title">Secure</div>
-                    <div class="feature-desc">Enterprise-grade security</div>
-                </div>
+            <h1 class="hero-title">Streamline Your IT Support Workflow</h1>
+            <p class="hero-subtitle">
+                Submit IT support requests, track ticket progress, and resolve technical issues efficiently with our enterprise ticketing system designed for banking operations.
+            </p>
+            <div class="hero-actions">
+                <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="/Admin/Index" class="btn btn-primary btn-lg">
+                    Sign In to Dashboard
+                </a>
+                <a href="#quickComplaint" class="btn btn-outline-primary btn-lg">
+                    Submit a Ticket
+                </a>
             </div>
         </div>
+    </div>
 
-        <div class="complaint-form-section" id="quickComplaint">
-            <h3>Quick Complaint Submission</h3>
-            <form asp-controller="Complaint" asp-action="Create" method="post" enctype="multipart/form-data">
-                <div class="form-group-inline">
-                    <div class="form-group">
-                        <label class="form-label">Employee Name</label>
-                        <input type="text" name="EmployeeName" class="form-control" required />
+    <!-- Features Section -->
+    <div class="features-section">
+        <div class="grid grid-cols-4 gap-lg">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Fast Tracking</h3>
+                <p class="feature-description">Real-time ticket updates and status notifications for complete visibility</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 010 7.75"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Expert Support</h3>
+                <p class="feature-description">Dedicated IT managers for each department ensuring specialized assistance</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="20" x2="18" y2="10"/>
+                        <line x1="12" y1="20" x2="12" y2="4"/>
+                        <line x1="6" y1="20" x2="6" y2="14"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Analytics</h3>
+                <p class="feature-description">Comprehensive performance reports and metrics for data-driven decisions</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                        <path d="M7 11V7a5 5 0 0110 0v4"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Secure</h3>
+                <p class="feature-description">Enterprise-grade security and compliance for banking industry standards</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Ticket Form -->
+    <div class="ticket-form-section" id="quickComplaint">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">Quick Ticket Submission</h3>
+            </div>
+            <div class="card-body">
+                <form asp-controller="Complaint" asp-action="Create" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+
+                    <div class="grid grid-cols-2 gap-lg mb-lg">
+                        <div class="form-group">
+                            <label class="form-label">Employee Name <span class="text-danger">*</span></label>
+                            <input type="text" name="EmployeeName" class="form-control" required placeholder="Enter your full name" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Employee ID <span class="text-danger">*</span></label>
+                            <input type="text" name="EmployeeId" class="form-control" required placeholder="Enter your employee ID" />
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Employee ID</label>
-                        <input type="text" name="EmployeeId" class="form-control" required />
+
+                    <div class="grid grid-cols-2 gap-lg mb-lg">
+                        <div class="form-group">
+                            <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                            <input type="email" name="Email" class="form-control" required placeholder="your.email@bank.com" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" name="Phone" class="form-control" placeholder="Extension or mobile number" />
+                        </div>
                     </div>
-                </div>
 
-                <div class="form-group-inline">
-                    <div class="form-group">
-                        <label class="form-label">Email</label>
-                        <input type="email" name="Email" class="form-control" required />
+                    <div class="grid grid-cols-2 gap-lg mb-lg">
+                        <div class="form-group">
+                            <label class="form-label">Department <span class="text-danger">*</span></label>
+                            <select name="DepartmentId" class="form-select" required>
+                                <option value="">-- Select Department --</option>
+                                @foreach (var dept in ViewBag.Departments ?? new List<dynamic>())
+                                {
+                                    <option value="@dept.Id">@dept.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Branch <span class="text-danger">*</span></label>
+                            <select name="BranchId" class="form-select" required>
+                                <option value="">-- Select Branch --</option>
+                                @foreach (var branch in ViewBag.Branches ?? new List<dynamic>())
+                                {
+                                    <option value="@branch.Id">@branch.Name</option>
+                                }
+                            </select>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Phone</label>
-                        <input type="tel" name="Phone" class="form-control" />
+
+                    <div class="grid grid-cols-2 gap-lg mb-lg">
+                        <div class="form-group">
+                            <label class="form-label">Category <span class="text-danger">*</span></label>
+                            <select name="CategoryId" class="form-select" required>
+                                <option value="">-- Select Category --</option>
+                                @foreach (var cat in ViewBag.Categories ?? new List<dynamic>())
+                                {
+                                    <option value="@cat.Id">@cat.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Priority <span class="text-danger">*</span></label>
+                            <select name="Priority" class="form-select" required>
+                                <option value="">-- Select Priority --</option>
+                                <option value="0">Low</option>
+                                <option value="1" selected>Medium</option>
+                                <option value="2">High</option>
+                                <option value="3">Critical</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
 
-                <div class="form-group-inline">
-                    <div class="form-group">
-                        <label class="form-label">Department</label>
-                        <select name="DepartmentId" class="form-select" required></select>
+                    <div class="form-group mb-lg">
+                        <label class="form-label">Subject <span class="text-danger">*</span></label>
+                        <input type="text" name="Subject" class="form-control" maxlength="200" required placeholder="Brief summary of the issue" />
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Branch</label>
-                        <select name="BranchId" class="form-select" required></select>
+
+                    <div class="form-group mb-lg">
+                        <label class="form-label">Description <span class="text-danger">*</span></label>
+                        <textarea name="Description" class="form-control" rows="4" required placeholder="Provide detailed information about the issue..."></textarea>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label class="form-label">Subject</label>
-                    <input type="text" name="Subject" class="form-control" maxlength="200" required />
-                </div>
+                    <div class="form-group mb-lg">
+                        <label class="form-label">Attachment (optional)</label>
+                        <input type="file" name="Attachment" class="form-control" />
+                        <small class="text-muted">Supported formats: PDF, DOC, XLS, PNG, JPG (Max 5MB)</small>
+                    </div>
 
-                <div class="form-group">
-                    <label class="form-label">Description</label>
-                    <textarea name="Description" class="form-control" required></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Attachment (optional)</label>
-                    <input type="file" name="Attachment" class="form-control" />
-                </div>
-
-                <div style="text-align: center; margin-top: 1.5rem;">
-                    <button type="submit" class="btn-primary-gradient">Submit Complaint</button>
-                </div>
-            </form>
+                    <div class="flex justify-center gap-md">
+                        <button type="submit" class="btn btn-primary btn-lg">Submit Ticket</button>
+                        <button type="reset" class="btn btn-secondary btn-lg">Clear Form</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>

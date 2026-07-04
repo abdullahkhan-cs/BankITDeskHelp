@@ -39,7 +39,7 @@ namespace BankITDeskHelp.Models
         [Required, MaxLength(200)]
         public string Subject { get; set; } = string.Empty;
 
-        [Required]
+        [Required, MaxLength(5000)]
         public string Description { get; set; } = string.Empty;
 
         public ComplaintStatus Status { get; set; } = ComplaintStatus.New;

@@ -24,13 +24,16 @@ namespace BankITDeskHelp.Controllers
         public async Task<IActionResult> Index()
         {
             var currentUser = await _userManager.GetUserAsync(User);
-            if (currentUser == null) return Unauthorized();
+            if (currentUser == null)
+                return RedirectToAction("Login", "Account");
 
             var myTickets = await _context.Complaints
+                .AsNoTracking()
                 .Include(c => c.Department)
                 .Include(c => c.Branch)
                 .Where(c => c.AssignedManagerId == currentUser.Id)
                 .OrderByDescending(c => c.AssignedAt)
+                .Take(50)
                 .ToListAsync();
 
             ViewBag.AssignedCount = myTickets.Count(c => c.Status == ComplaintStatus.Assigned);
@@ -45,6 +48,8 @@ namespace BankITDeskHelp.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+                return RedirectToAction("Login", "Account");
 
             var complaint = await _context.Complaints
                 .Include(c => c.Department)
@@ -52,7 +57,7 @@ namespace BankITDeskHelp.Controllers
                 .Include(c => c.Attachments)
                 .Include(c => c.Comments)
                 .Include(c => c.Histories)
-                .FirstOrDefaultAsync(c => c.Id == id && c.AssignedManagerId == currentUser!.Id);
+                .FirstOrDefaultAsync(c => c.Id == id && c.AssignedManagerId == currentUser.Id);
 
             if (complaint == null) return NotFound();
 

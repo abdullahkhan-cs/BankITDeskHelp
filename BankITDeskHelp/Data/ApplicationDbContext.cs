@@ -38,6 +38,21 @@ namespace BankITDeskHelp.Data
                 .HasOne(c => c.AuthorUser)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
+
+            // Add unique constraint on TicketNumber
+            builder.Entity<Complaint>()
+                .HasIndex(c => c.TicketNumber)
+                .IsUnique();
+
+            // Add indexes for performance
+            builder.Entity<Complaint>()
+                .HasIndex(c => c.Status);
+            builder.Entity<Complaint>()
+                .HasIndex(c => c.AssignedManagerId);
+            builder.Entity<Complaint>()
+                .HasIndex(c => c.DepartmentId);
+            builder.Entity<Complaint>()
+                .HasIndex(c => c.CreatedAt);
         }
     }
 }

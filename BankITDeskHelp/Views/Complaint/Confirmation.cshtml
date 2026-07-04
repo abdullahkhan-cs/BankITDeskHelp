@@ -2,16 +2,31 @@
     ViewData["Title"] = "Complaint Submitted";
 }
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-6">
-            <div class="card shadow-sm border-0 text-center p-4">
-                <div class="card-body">
-                    <h2 class="text-success mb-3">✅ Complaint Submitted Successfully</h2>
-                    <p class="text-muted">Your ticket number is:</p>
-                    <h3 class="fw-bold mb-4">@ViewBag.TicketNumber</h3>
-                    <p>Please save this number to track your complaint status.</p>
-                    <a asp-controller="Complaint" asp-action="Track" class="btn btn-outline-primary mt-3">Track Complaint</a>
+<div class="d-flex align-items-center justify-content-center" style="min-height: 60vh;">
+    <div style="width: 100%; max-width: 500px;">
+        <div class="card">
+            <div class="card-body text-center p-xl">
+                <div class="mb-lg">
+                    <div style="width: 80px; height: 80px; background: var(--color-success-50); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto;">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-success-600)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                </div>
+                
+                <h2 class="mb-md">Complaint Submitted Successfully</h2>
+                <p class="text-muted mb-lg">Your ticket has been created and is being processed.</p>
+                
+                <div class="alert alert-info mb-lg">
+                    <small class="text-muted">Your Ticket Number</small>
+                    <div class="font-weight-bold" style="font-size: 1.5rem;">@ViewBag.TicketNumber</div>
+                </div>
+                
+                <p class="text-muted mb-xl">Please save this ticket number to track your complaint status.</p>
+                
+                <div class="flex flex-col gap-md">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Return to Home</a>
+                    <a asp-controller="Complaint" asp-action="Create" class="btn btn-outline-primary">Submit Another Ticket</a>
                 </div>
             </div>
         </div>

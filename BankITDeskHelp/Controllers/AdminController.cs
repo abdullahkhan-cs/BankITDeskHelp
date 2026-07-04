@@ -25,20 +25,22 @@ namespace BankITDeskHelp.Controllers
         // GET: /Admin/Index
         public async Task<IActionResult> Index()
         {
-            ViewBag.NewCount = await _context.Complaints.CountAsync(c => c.Status == ComplaintStatus.New);
-            ViewBag.AssignedCount = await _context.Complaints.CountAsync(c => c.Status == ComplaintStatus.Assigned);
-            ViewBag.InProgressCount = await _context.Complaints.CountAsync(c => c.Status == ComplaintStatus.InProgress);
-            ViewBag.ResolvedCount = await _context.Complaints.CountAsync(c => c.Status == ComplaintStatus.Resolved);
-            ViewBag.ClosedCount = await _context.Complaints.CountAsync(c => c.Status == ComplaintStatus.Closed);
-
-            ViewBag.TotalUsers = await _context.Users.CountAsync();
+            var metrics = await _metricsService.GetMetricsAsync();
+            
+            ViewBag.NewCount = metrics.NewCount;
+            ViewBag.AssignedCount = metrics.AssignedCount;
+            ViewBag.InProgressCount = metrics.InProgressCount;
+            ViewBag.ResolvedCount = metrics.ResolvedCount;
+            ViewBag.ClosedCount = metrics.ClosedCount;
+            ViewBag.TotalUsers = metrics.TotalUsers;
             ViewBag.TotalDepartments = await _context.Departments.CountAsync();
 
             var recentComplaints = await _context.Complaints
+                .AsNoTracking()
                 .Include(c => c.Department)
                 .Include(c => c.Branch)
                 .OrderByDescending(c => c.CreatedAt)
-                .Take(10)
+                .Take(20)
                 .ToListAsync();
 
             return View(recentComplaints);
@@ -194,7 +196,8 @@ namespace BankITDeskHelp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EnsureManagers()
         {
-            await BankITDeskHelp.Data.SeedData.SeedManagerUserAsync(_userManager);
+            var configuration = HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+            await BankITDeskHelp.Data.SeedData.SeedManagerUserAsync(_userManager, configuration, _context);
             TempData["Message"] = "Ensured demo managers exist.";
             return RedirectToAction("Index");
         }

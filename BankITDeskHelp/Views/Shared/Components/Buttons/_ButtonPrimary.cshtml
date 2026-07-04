@@ -1,0 +1,16 @@
+@* Primary Action Button Component *@
+@{
+    var text = ViewData["text"]?.ToString() ?? "Button";
+    var url = ViewData["url"]?.ToString() ?? "#";
+    var size = ViewData["size"]?.ToString() ?? "md";
+    var classes = ViewData["class"]?.ToString() ?? "";
+    var onClick = ViewData["onClick"]?.ToString();
+    var disabled = ViewData["disabled"]?.ToString() == "true";
+}
+
+<a href="@url" 
+   class="btn btn-primary @(size == "sm" ? "btn-sm" : size == "lg" ? "btn-lg" : "") @classes" 
+   @(disabled ? "onclick='return false;' style='opacity:0.5;cursor:not-allowed;'" : "")
+   @(!string.IsNullOrEmpty(onClick) ? $"onclick='{onClick}'" : "")>
+    @text
+</a>
