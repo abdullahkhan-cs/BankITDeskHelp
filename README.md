@@ -142,6 +142,14 @@ On first run, the application automatically seeds:
 3. **Manager** logs in, starts work on assigned tickets, adds comments, and resolves them.
 4. **Admin** reviews resolved tickets and either closes them or reassigns them back to the Manager.
 
+## Screenshots
+
+### Login Page
+![Login Page](images/login.png)
+
+### Admin Dashboard
+![Admin Dashboard](images/dashboard.png)
+
 ## Roadmap
 
 - Public complaint tracking (ticket lookup without login)
